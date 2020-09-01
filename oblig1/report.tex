@@ -1,0 +1,159 @@
+\documentclass[10pt, a4paper]{amsart}
+% \documentclass[10pt,showpacs,preprintnumbers,footinbib,amsmath,amssymb,aps,prl,twocolumn,groupedaddress,superscriptaddress,showkeys]{revtex4-1}
+\usepackage[]{graphicx}
+\usepackage[]{hyperref}
+\usepackage[]{physics}
+\usepackage[]{listings}
+\usepackage[T1]{fontenc}
+\usepackage{color}
+\usepackage[ruled,vlined]{algorithm2e}
+
+\definecolor{mygreen}{rgb}{0,0.6,0}
+\definecolor{mymauve}{rgb}{0.58,0,0.82}
+
+\lstset{ %
+  backgroundcolor=\color{white},   % choose the background color; you must add \usepackage{color} or \usepackage{xcolor}
+  basicstyle=\footnotesize,        % the size of the fonts that are used for the code
+  breakatwhitespace=false,         % sets if automatic breaks should only happen at whitespace
+  breaklines=true,                 % sets automatic line breaking
+  captionpos=b,                    % sets the caption-position to bottom
+  commentstyle=\color{mygreen},    % comment style
+  deletekeywords={...},            % if you want to delete keywords from the given language
+  escapeinside={\%*}{*)},          % if you want to add LaTeX within your code
+  extendedchars=true,              % lets you use non-ASCII characters; for 8-bits encodings only, does not work with UTF-8
+  frame=single,	                   % adds a frame around the code
+  keepspaces=true,                 % keeps spaces in text, useful for keeping indentation of code (possibly needs columns=flexible)
+  keywordstyle=\color{blue},       % keyword style
+  language=c++,                    % the language of the code
+  otherkeywords={*,...},           % if you want to add more keywords to the set
+  rulecolor=\color{black},         % if not set, the frame-color may be changed on line-breaks within not-black text (e.g. comments (green here))
+  showspaces=false,                % show spaces everywhere adding particular underscores; it overrides 'showstringspaces'
+  showstringspaces=false,          % underline spaces within strings only
+  showtabs=false,                  % show tabs within strings adding particular underscores
+  stepnumber=2,                    % the step between two line-numbers. If it's 1, each line will be numbered
+  stringstyle=\color{mymauve},     % string literal style
+  tabsize=2,	                     % sets default tabsize to 2 spaces
+}
+
+
+\title[Solving the Poisson-equation in one dimension]{Solving the Poisson-equation in one dimension: \\
+\normalsize{Tridiagonal Matrix Algorithm\\
+ and \\
+ LU-decomposition} \\
+  \hrulefill\small{ FYS3150: Computational Physics }\hrulefill}
+
+\author[Sundberg]{Sigurd Sandvoll Sundberg \\
+  \href{https://https://github.com/SigurdSundberg/GEO2300/}{\texttt{github.com/sigurdsundberg}}}
+
+\begin{document}
+
+\begin{titlepage}
+\maketitle
+\tableofcontents
+\end{titlepage}
+
+\section{Problem 1: Matricies}
+\section{Problem 2: Poisueille Flow}
+\section{Problem 3: More finite differences}
+
+
+%\section{Theory}
+%\subsection{The Poisson Equation}
+%add section on poisson equation
+%>> Dirilect boundary conditions >> relation between f(x) u'' >> Check equal
+%\subsection{Approximation of the Second Derivative}
+%Add section on approx of second derivative
+%>> Going from diff equation >> linear form Av = b >> Matrix -1,2,-1
+%\subsection{Relative Error}
+%Add short theory of relative error
+%>> YES
+
+
+%%% footnote
+% rainforest\footnote{Writing out a general case will also take up more paper
+% space}.
+
+%%% Matrix with line through between last elements
+% \begin{equation}
+% \left[
+% \begin{array}{cccc|c}
+% 1 & c_1/\beta_1 & 0 & 0 & \tilde{f}_1 \\
+% 0 & 1 & c_2/\beta_2 & 0  & \tilde{f}_2 \\
+% 0 & 0 & 1 & c_3/\beta_3 & \tilde{f}_3 \\
+% 0 & 0 & 0 & 1 & \tilde{f}_4
+% \end{array}
+% \right] \sim
+% \left[
+% \begin{array}{cccc|c}
+% 1 & c_1/\beta_1 & 0 & 0 & \tilde{f}_1 \\
+% 0 & 1 & c_2/\beta_2 & 0  & \tilde{f}_2 \\
+% 0 & 0 & 1 & 0 & \tilde{f}_3 -\frac{c_3}{\beta_3}\tilde{f}_4 \\
+% 0 & 0 & 0 & 1 & \tilde{f}_4
+% \end{array}
+% \right]
+% \end{equation}
+
+%%% Listing
+% \lstinputlisting[language=c++, firstline=146,
+% lastline=158]{../problems.cpp}
+
+%%% LU matrix, with diag dots for general case
+% \begin{equation}
+% A = LU =
+% \begin{bmatrix}
+% 1 & 0 & 0 & \dots & 0 & 0 \\
+% l_{21} & 1 & 0 & \dots & 0 & 0 \\
+% l_{31} & l_{32} & 1 & \dots & 0 & 0 \\
+%   &\vdots & & \ddots & \vdots  & \\
+% l_{n-11} & l_{n-12} & l_{n-13} & \dots & 1 & 0 \\
+% l_{n1} & l_{n2} & l_{n3} & \dots & l_{nn-1} & 1
+% \end{bmatrix}
+% \begin{bmatrix}
+% u_{11} & u_{12} & u_{13} & \dots & u_{1n-1} & u_{1n} \\
+% 0 & u_{22} & u_{23} & \dots & u_{2n-1} & u_{2n} \\
+% 0 & 0 & u_{33} & \dots & u_{3n-1} & u_{3n} \\
+%   &\vdots & & \ddots & \vdots  & \\
+% 0 & 0 & 0 & \dots & u_{n-1n-1} & u_{n-1n} \\
+% 0 & 0 & 0 & \dots & 0 & u_{nn}
+% \end{bmatrix}
+% \end{equation}
+
+%%% Table
+% \begin{table}[h]
+% \caption{Elapsed time for increasing $n$}
+% \begin{tabular}{lcc}
+% \hline
+% n & TDMA [s] & LU [s] \\ \hline
+% 10 & 0.0000035 & 0.00106083 \\
+% 100 & 0.0000116 & 0.0022319 \\
+% 1000 & 0.000077892 & 0.0677764 \\
+% 10000 & 0.000878769 & 21.9247 \\
+% 100000 & 0.00757418 & n/a \\
+% 1000000 & 0.08616075 & n/a \\
+% 10000000 & 0.76534 & n/a
+% \end{tabular}
+% \label{tab:solver_times}
+% \end{table}
+
+%%% Figure
+% \begin{figure}[h]
+  % \centering
+  % \includegraphics[width=0.9\linewidth]{figures/relerror.png}
+  % \caption{Plot of maximum relative error as a function of step size}
+  % \label{fig:relerror}
+% \end{figure}
+
+%%% Cition and bilbliography%%
+% # \emph{Thomas Algorithm} \cite{thomasalgo} How to cite.
+% \begin{thebibliography}{10}
+  % \bibitem{thomasalgo}{Thomas, L.H. (1949), \emph{Elliptic
+        % Problems in Linear Differential Equations over a
+        % Network}. Watson Sci. Comput. Lab Report, Columbia University,
+      % New York.}
+      % \bibitem{morten}{Hjorth-Jensen, M. (2015). \emph{Computational
+        % Physics - Lecture Notes 2015}. University of Oslo}
+    % \bibitem{golub}{Golub, G.H., van Loan, C.F. (1996). \emph{Matrix
+          % Computations} (3rd ed.), Baltimore: John Hopkins.}
+% \end{thebibliography}
+
+\end{document}
