@@ -8,8 +8,40 @@
 \usepackage{color}
 \usepackage[ruled,vlined]{algorithm2e}
 
+\usepackage{amsmath, amsfonts, amssymb}
+\usepackage{listings}
+
+% Definition of code and how the code should look.
+\usepackage{xcolor}
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
 \definecolor{mygreen}{rgb}{0,0.6,0}
 \definecolor{mymauve}{rgb}{0.58,0,0.82}
+
+
+\lstdefinestyle{python3}{
+    backgroundcolor=\color{backcolour},
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,
+    breaklines=true,
+    captionpos=b,
+    keepspaces=true,
+    numbers=left,
+    numbersep=5pt,
+    showspaces=false,
+    showstringspaces=false,
+    showtabs=false,
+    tabsize=2
+}
+% End def.
+
+
 
 \lstset{ %
   backgroundcolor=\color{white},   % choose the background color; you must add \usepackage{color} or \usepackage{xcolor}
@@ -24,7 +56,8 @@
   frame=single,	                   % adds a frame around the code
   keepspaces=true,                 % keeps spaces in text, useful for keeping indentation of code (possibly needs columns=flexible)
   keywordstyle=\color{blue},       % keyword style
-  language=c++,                    % the language of the code
+  language=python,                    % the language of the code
+  style = python3,
   otherkeywords={*,...},           % if you want to add more keywords to the set
   rulecolor=\color{black},         % if not set, the frame-color may be changed on line-breaks within not-black text (e.g. comments (green here))
   showspaces=false,                % show spaces everywhere adding particular underscores; it overrides 'showstringspaces'
@@ -35,12 +68,9 @@
   tabsize=2,	                     % sets default tabsize to 2 spaces
 }
 
-
-\title[Solving the Poisson-equation in one dimension]{Solving the Poisson-equation in one dimension: \\
-\normalsize{Tridiagonal Matrix Algorithm\\
- and \\
- LU-decomposition} \\
-  \hrulefill\small{ FYS3150: Computational Physics }\hrulefill}
+\title[Problem set 1]{Problem set 1: GEO2300: \\
+\normalsize{Due: 16 Sept. 2020} \\
+  \hrulefill\small{ GEO2300: Fysiske prosesser i geofag }\hrulefill}
 
 \author[Sundberg]{Sigurd Sandvoll Sundberg \\
   \href{https://https://github.com/SigurdSundberg/GEO2300/}{\texttt{github.com/sigurdsundberg}}}
@@ -53,20 +83,107 @@
 \end{titlepage}
 
 \section{Problem 1: Matricies}
+In this section we will study the properties of matricies. How they are used to solve a system of linear equations, inverting matricies and finding eiegenvalues and eigenvectors, and lastly expressing matricies as a sum of eigenvectors and exponentials with corresponding eigenvalues. 
+
+First we will look at solving the following system of linear equations as a matrix equation
+\begin{equation}\label{eq:sys_linear}
+\begin{split}
+	x + 2y + z &= -1\\
+	2x - y + 3z &= -5 \\
+	-x + 3y- z &= 6
+\end{split}
+\end{equation}
+We can rewrite Eq: \ref{eq:sys_linear} on the form $\mathbf{A}\vec{x} = \vec{b}$
+\begin{equation}
+	\begin{bmatrix}
+		1 & 2 & 1 & -1\\
+		2 & -1 & 3 & -5 \\
+		-1 & 3 & -1 & 6
+	\end{bmatrix}
+	\begin{bmatrix}
+	x\\y\\z
+	\end{bmatrix}
+	=
+	\begin{bmatrix}
+	1\\-5\\6
+	\end{bmatrix}
+\end{equation}
+We can rewrite this system on the form $[\mathbf{A} : \vec{b}]$ and solve the augmented matrix by finding the row reduced echelon form. We then have 
+\begin{align}
+ \left[
+ \begin{array}{ccc|c}
+ 1 & 2 & 1 & 1 \\
+ 2 & -1 & 3 & -5\\
+-1 & 3 & -1 & 6
+ \end{array}
+ \right] &\sim
+ \left[
+ \begin{array}{ccc|c}
+ 1 & 2 & 1 & 1 \\
+ 0 & -5 & 1 & -7\\
+0 & 5 & 0 & 7
+ \end{array}
+ \right]\\
+ \left[
+ \begin{array}{ccc|c}
+ 1 & 2 & 1 & 1 \\
+ 0 & 1 & 0 & 7/5\\
+0 & 0 & 1 & 0
+ \end{array}
+ \right] &\sim 
+ \left[
+ \begin{array}{ccc|c}
+ 1 & 0 & 0 & -9/5 \\
+ 0 & 1 & 0 & 7/5\\
+0 & 0 & 1 & 0
+ \end{array}
+ \right]
+ \end{align}
+ giving us that the solution to the set of linear equations given in Eq: \ref{eq:sys_linear} is given by 
+ \begin{align*}
+  x &= -9/5\\
+  y &= 7/5\\
+  z &= 0
+ \end{align*}
+ This can easily be confirmed numerically by doing $rref([A : b])$. 
+ 
+ Second, we will look at inversing matrixes, both analytically for the 2x2-matrix and numerically for the others. Looking at the 2x2-matrix we have that in the general case 
+ \begin{equation*}
+ 	A = 
+ 	\begin{bmatrix}
+ 		a & b\\
+ 		c & d	
+ 	\end{bmatrix}, \quad A^{-1} = \frac{1}{ad-bc}
+ 	\begin{bmatrix}
+ 	d & -b\\
+ 	-c & a
+ 	\end{bmatrix}
+ \end{equation*}
+ We then have for our 2x2-matrix as follows
+ \begin{equation}
+ A = 
+ \begin{bmatrix}
+ 1 & 2 \\
+ -1 & 3
+ \end{bmatrix}, \quad A^{-1} = \frac{1}{3\cdot 1 - (-1\cdot 2)}
+ \begin{bmatrix}
+ 3 & -2 \\
+ 1 & 1
+ \end{bmatrix}
+ = \frac{1}{5}
+ \begin{bmatrix}
+ 	3 & -2 \\
+ 	1 & 1
+ \end{bmatrix}
+ \end{equation}
+ For the two next matricies being a 3x3 and 4x4 matrix, which are fairly tedious to solve by hand, we will use functions in Python 3 to do the inverting for us, spesifically the Numpy library. 
+ 
+\lstinputlisting[firstline=2, lastline=8]{"./code/1b_inverse.py"}
+
+Which gives the following output
+ 
 \section{Problem 2: Poisueille Flow}
 \section{Problem 3: More finite differences}
-
-
-%\section{Theory}
-%\subsection{The Poisson Equation}
-%add section on poisson equation
-%>> Dirilect boundary conditions >> relation between f(x) u'' >> Check equal
-%\subsection{Approximation of the Second Derivative}
-%Add section on approx of second derivative
-%>> Going from diff equation >> linear form Av = b >> Matrix -1,2,-1
-%\subsection{Relative Error}
-%Add short theory of relative error
-%>> YES
 
 
 %%% footnote
