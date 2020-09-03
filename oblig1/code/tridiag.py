@@ -83,6 +83,13 @@ def vec_x(n):
 
 
 def plotter(x, data, solver):
+    """Plotting the data
+
+    Args:
+        x (1d-array): x-values
+        data (1d-array): data values
+        solver (functions): which solver for the data set is used
+    """
     plt.rcParams.update({
         "text.usetex": True,
         "font.family": "sans-serif",
