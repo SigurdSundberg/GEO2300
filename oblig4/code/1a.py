@@ -7,6 +7,7 @@ Solutions to problemset 4.
 import numpy as np
 import matplotlib.pyplot as plt
 
+plt.style.use("bmh")
 plt.rcParams.update({
     "text.usetex": True,
     "font.family": "DejaVu Sans",
@@ -25,9 +26,6 @@ class Analytical():
         v = self._v
         return a / 2 - a / 2 * np.tanh(a * ((x - (a * t / 2)) / (4 * v)))
 
-    def plot(self):
-        pass
-
 
 def plotting():
     # Fixed variables
@@ -44,6 +42,7 @@ def plotting():
     plt.xlabel(r"Distance [km]")
     plt.ylabel(r"Height [m]")
     plt.legend()
+    plt.savefig("1a1.png")
     plt.show()
     # ****************************************************** #
 
@@ -57,26 +56,28 @@ def plotting():
     plt.xlabel(r"Distance [km]")
     plt.ylabel(r"Height [m]")
     plt.legend()
+    plt.savefig("1a2.png")
     plt.show()
     # ****************************************************** #
 
     # ****************************************************** #
     # Case 3: a = 2, v = 0.1 and v = 1
-    c = ['b', 'r', 'k']
-    i = 0
-    a, v1 = (2, 0.1)
-    a, v2 = (2, 1)
-    f1 = Analytical(a, v1)
-    f2 = Analytical(a, v2)
-    for t in t_list:
-        plt.plot(x, f1(x, t), c[i] + '--', label=rf"$\nu = 0.1$")
-        plt.plot(x, f2(x, t), c[i], label=rf"$\nu = 1$")
-        i += 1
-    plt.title(r"$a = 2, \nu = 0.1 \land \nu = 1$")
-    plt.xlabel(r"Distance [km]")
-    plt.ylabel(r"Height [m]")
-    plt.legend()
-    plt.show()
+    # c = ['b', 'r', 'k']
+    # i = 0
+    # a, v1 = (2, 0.1)
+    # a, v2 = (2, 1)
+    # f1 = Analytical(a, v1)
+    # f2 = Analytical(a, v2)
+    # for t in t_list:
+    #     plt.plot(x, f1(x, t), c[i] + '--', label=rf"$\nu = 0.1$")
+    #     plt.plot(x, f2(x, t), c[i], label=rf"$\nu = 1$")
+    #     i += 1
+    # plt.title(r"$a = 2, \nu = 0.1 \land \nu = 1$")
+    # plt.xlabel(r"Distance [km]")
+    # plt.ylabel(r"Height [m]")
+    # plt.legend()
+    # plt.savefig("1a3.png")
+    # plt.show()
     # ****************************************************** #
 
     # ****************************************************** #
@@ -89,6 +90,7 @@ def plotting():
     plt.xlabel(r"Distance [km]")
     plt.ylabel(r"Height [m]")
     plt.legend()
+    plt.savefig("1a4.png")
     plt.show()
     # ****************************************************** #
 

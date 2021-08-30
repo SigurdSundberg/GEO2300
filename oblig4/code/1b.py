@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 import sys
 import time
 import warnings
-
+plt.style.use("bmh")
 warnings.filterwarnings('error')
 plt.rcParams.update({
     "text.usetex": True,
@@ -29,7 +29,7 @@ class Analytical():
         # Function call
         a = self._a
         v = self._v
-        return .5*a - .5*a*np.tanh(a*((x - (.5*a*t)) / (4*v)))
+        return .5 * a - .5 * a * np.tanh(a * ((x - (.5 * a * t)) / (4 * v)))
 
     def plot(self):
         pass
@@ -46,11 +46,9 @@ class Burgers():
     def dirichlet(self, Boundaries):
         self.bound = np.zeros(self._n)
         self.bound[0] = Boundaries[0] * s + Boundaries[0] * c
-        self.bound[-1] = Boundaries[1] * s + Boundaries[-1] * c
+        self.bound[-1] = Boundaries[1] * s + Boundaries[1] * c
 
     def neumann(self):
-        # self.Lb = (1-2*self._s) + self._s * Boundaries[0]
-        # self.Ub = (1-2*self._s) + self._s * Boundaries[1]
         raise NotImplementedError
 
     def setup(self, Boundaries, Type):
@@ -63,28 +61,28 @@ class Burgers():
         n = self._n
         c = self._c
         s = self._s
-        for i in range(1, n-1):
-            self._A[i, i-1] = c
-            self._A[i, i+1] = -c
-            self._B[i, i-1] = s
-            self._B[i, i] = 1-2*s
-            self._B[i, i+1] = s
+        for i in range(1, n - 1):
+            self._A[i, i - 1] = c
+            self._A[i, i + 1] = -c
+            self._B[i, i - 1] = s
+            self._B[i, i] = 1 - 2 * s
+            self._B[i, i + 1] = s
         # Matrix boundaries
         self._A[0, 1] = -c
-        self._B[0, 0] = 1-2*s
+        self._B[0, 0] = 1 - 2 * s
         self._B[0, 1] = s
         self._A[-1, -2] = c
-        self._B[-1, -1] = 1-2*s
+        self._B[-1, -1] = 1 - 2 * s
         self._B[-1, -2] = s
 
-    def FTCS(self, dt, t_end, U):
+    def FTCS(self, dt, t_initial, t_end, U):
         self._T = t_end
         self._dt = dt
         self._u = U  # Initial function
 
         def Evec(): return 0.5 * (self._u * self._u)
 
-        t = 0
+        t = t_initial
         E = Evec()
         while t < self._T:
             t += dt
@@ -97,7 +95,7 @@ class Burgers():
                 break
 
     def plot(self, x, nu=None, a=None):
-        plt.plot(x, self._u, '--', label=rf"t = {self._T:d}")
+        plt.plot(x, self._u, '--', label=rf"Numerical at t = {self._T:d}")
         plt.title(
             rf"$a = {a:.1f}, \nu = {nu:.2f}, s = {self._s:.2f}$")
         plt.xlabel(r"Distance [km]")
@@ -115,24 +113,27 @@ if __name__ == '__main__':
 
     # Domain setup
     n = 750
+    time_initial = 1
     t_list = [10, 20]
     x = np.linspace(-10, 30, n)
     dx = x[1] - x[0]
 
     # Fixed variables
-    dt = (s*dx*dx) / v
-    c = dt / (2*dx)
+    dt = (s * dx * dx) / v
+    c = dt / (2 * dx)
 
     start_time = time.time()
     wave = Analytical(a, v)
-    initial_wave = wave(x, 1)
+    initial_wave = wave(x, time_initial)
+
     solver = Burgers(s, c, n)
     solver.setup(B, "D")
     print("Setup --- %s seconds ---" % (time.time() - start_time))
+    plt.plot(x, initial_wave, 'b', label=rf"Initial wave")
     for t in t_list:
         start_time = time.time()
-        plt.plot(x, wave(x, t), label=rf"t = {t:d}")
-        solver.FTCS(dt, t, initial_wave)
+        plt.plot(x, wave(x, t), 'k', label=rf"Analytical at t = {t:d}", linewidth=2)
+        solver.FTCS(dt, time_initial, t, initial_wave)
         solver.plot(x, v, a)
         print("t = %d --- %s seconds ---" %
               (t, (time.time() - start_time)))
@@ -155,19 +156,21 @@ if __name__ == '__main__':
     dx = x[1] - x[0]
 
     # Fixed variables
-    dt = (s*dx*dx) / v
-    c = dt / (2*dx)
+    dt = (s * dx * dx) / v
+    c = dt / (2 * dx)
 
     start_time = time.time()
     wave = Analytical(a, v)
-    initial_wave = wave(x, 1)
+    initial_wave = wave(x, time_initial)
+
     solver = Burgers(s, c, n)
     solver.setup(B, "D")
     print("Setup --- %s seconds ---" % (time.time() - start_time))
+    plt.plot(x, initial_wave, label=rf"Initial wave")
     for t in t_list:
         start_time = time.time()
-        plt.plot(x, wave(x, t), label=rf"t = {t:d}")
-        solver.FTCS(dt, t, initial_wave)
+        plt.plot(x, wave(x, t), 'k', label=rf"Analytical at t = {t:d}", linewidth=2)
+        solver.FTCS(dt, time_initial, t, initial_wave)
         solver.plot(x, v, a)
         print("t = %d --- %s seconds ---" %
               (t, (time.time() - start_time)))
@@ -190,19 +193,21 @@ if __name__ == '__main__':
     dx = x[1] - x[0]
 
     # Fixed variables
-    dt = (s*dx*dx) / v
-    c = dt / (2*dx)
+    dt = (s * dx * dx) / v
+    c = dt / (2 * dx)
 
     start_time = time.time()
     wave = Analytical(a, v)
-    initial_wave = wave(x, 1)
+    initial_wave = wave(x, time_initial)
+
     solver = Burgers(s, c, n)
     solver.setup(B, "D")
     print("Setup --- %s seconds ---" % (time.time() - start_time))
+    plt.plot(x, initial_wave, label=rf"Initial wave")
     for t in t_list:
         start_time = time.time()
-        plt.plot(x, wave(x, t), label=rf"t = {t:d}")
-        solver.FTCS(dt, t, initial_wave)
+        plt.plot(x, wave(x, t), 'k', label=rf"Analytical at t = {t:d}", linewidth=2)
+        solver.FTCS(dt, time_initial, t, initial_wave)
         solver.plot(x, v, a)
         print("t = %d --- %s seconds ---" %
               (t, (time.time() - start_time)))

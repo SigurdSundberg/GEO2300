@@ -8,6 +8,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import warnings
 
+plt.style.use("bmh")
 warnings.filterwarnings('error')
 plt.rcParams.update({
     "text.usetex": True,
@@ -32,7 +33,7 @@ class Chaos():
         self._stepLength = stepLength
         self._x = np.zeros(self._n)
         self._x[0] = startingPoint
-        self._u0 = startingPoint
+        self._u0 = startingPoint  # Potential artifact, not sure if needed
         self._timeAtWarning = self._n
 
     def __call__(self, r):
@@ -62,8 +63,6 @@ class Chaos():
         ix = self._x[index]
         try:  # This treats cases where our equation would be numerically unstable.
             rhs = self._r * ix * (1 - ix)
-            # print(rhs)
-            # input()
         except RuntimeWarning:
             print(rf"Overflow in advanceOneStep() for r = {self._r}. Stopping calculations.")
             self._timeAtWarning = index
@@ -85,10 +84,10 @@ class Chaos():
         roots = self._root()
         time = np.linspace(0, self._period, self._n)
         if self._timeAtWarning != self._n:
-            plt.plot(time[:self._timeAtWarning], self._x[:self._timeAtWarning], color='k', linestyle='-', markersize=2.7, marker='o', label=rf"Overflow at iteration: {self._timeAtWarning:d}, for r = {self._r:.1f}")
+            plt.plot(time[:self._timeAtWarning], self._x[:self._timeAtWarning], color='k', linestyle='-', markersize=1, marker='o', label=rf"Overflow at iteration: {self._timeAtWarning:d}, for r = {self._r:.1f}", linewidth=.7)
 
         else:
-            plt.plot(time, self._x, color='k', linestyle='-', markersize=2.7, marker='o', label=rf"r = {self._r:.1f}")
+            plt.plot(time, self._x, color='k', linestyle='-', markersize=1, marker='o', label=rf"r = {self._r:.1f}", linewidth=.7)
 
         # Plot the roots
         if (roots[0] == roots[1]):
@@ -107,7 +106,7 @@ class Chaos():
 if __name__ == "__main__":
     # ****************************************
     # Case 0: Initialization for all the other Cases.
-    finalTime = 100
+    finalTime = 1000
     uInitial = 0.2
     dt = 1
     system = Chaos(uInitial, finalTime, dt)
@@ -115,56 +114,93 @@ if __name__ == "__main__":
     # ****************************************
 
     # ****************************************
-    # Case 1: What range of if r \in [0,10.1) do we have a steady state solution? Which root is the steady solution?
-    for i, r in enumerate(rValues):
-        system(r)
-        array = system.getArray()
-        diff = abs(array[-1] - array[-2])
-        print(diff)
-        if (diff > 1e-3):
-            print(rf"Difference between the end points: {diff:.6f}")
-            break
-    print(rf"Range is r = [0, ..., {r:.1f}), with precision 1e-16(Machine zero).")
-    system.plot()
-    plt.title("Title")
-    plt.xlabel("x")
-    plt.ylabel("y")
-    plt.legend()
-    plt.show()
+    # # Case 1: What range of if r \in [0,10.1) do we have a steady state solution? Which root is the steady solution?
+    # for i, r in enumerate(rValues):
+    #     system(r)
+    #     array = system.getArray()
+    #     diff = abs(array[-1] - array[-2])
+    #     print(diff)
+    #     if (diff > 1e-3):
+    #         print(rf"Difference between the end points: {diff:.6f}")
+    #         break
+    # system(rValues[i])
+    # system.plot()
+    # plt.title("Last value of r which we have a steady state solution")
+    # plt.xlabel("x")
+    # plt.ylabel("y")
+    # plt.legend()
+    # # plt.savefig("d.png")
+    # plt.show()
+    # print(rf"Range is r = [0, ..., {r:.1f}), with precision 1e-16(Machine zero).")
+    # input()
     # ****************************************
     print("")
     # ****************************************
     # Case 2: Find an r for which we have a single oscillation?
+    i = 30
     for _ in range(len(rValues)):
         r = rValues[i]
         system(r)
         system.plot()
+        plt.title("Last value of r which we have a steady state solution")
+        plt.xlabel("x")
+        plt.ylabel("y")
+        plt.legend()
         plt.show()
 
         i += 1
-    # ****************************************
-    print("")
-    # ****************************************
-    # Case 3: Find an r for which we have a double oscillation?
 
+    # system(2.7)
+    # system.plot()
+    # plt.title("A invislbe single oscillation")
+    # plt.xlabel("x")
+    # plt.ylabel("y")
+    # plt.legend()
+    # plt.savefig("e1.png")
+    # plt.show()
+    # system(3.4)
+    # system.plot()
+    # plt.title("For which we have a single oscillation")
+    # plt.xlabel("x")
+    # plt.ylabel("y")
+    # plt.legend()
+    # plt.savefig("e2.png")
+    # plt.show()
+    # # ****************************************
+    # print("")
     # ****************************************
-    print("")
-    # ****************************************
-    # Case 4: For what range of r do we have chaotic oscillations? What are the min and max values of u?
-
-    # ****************************************
-    print("")
-    # ****************************************
-    # Case 5: For what r do we have a numerically unstable mapping?
-    for r in rValues:
-        Overflow = system(r)
-        if Overflow:
-            break
-    system.plot()
-    plt.title("Title")
-    plt.xlabel("x")
-    plt.ylabel("y")
-    plt.legend()
-    plt.show()
+    # # Case 3: Find an r for which we have a double oscillation?
+    # system(3.5)
+    # system.plot()
+    # plt.title("For which we have a double oscillation")
+    # plt.xlabel("x")
+    # plt.ylabel("y")
+    # plt.legend()
+    # plt.savefig("f.png")
+    # plt.show()
+    # # ****************************************
+    # print("")
+    # # ****************************************
+    # # Case 4: For what range of r do we have chaotic oscillations? What are the min and max values of u?
+    # system(3.8)
+    # system.plot()
+    # plt.title("For which we have a chaos")
+    # plt.xlabel("x")
+    # plt.ylabel("y")
+    # plt.legend()
+    # plt.savefig("g.png")
+    # plt.show()
+    # # ****************************************
+    # print("")
+    # # ****************************************
+    # # Case 5: For what r do we have a numerically unstable mapping?
+    # system(4.1)
+    # system.plot()
+    # plt.title("For which we have a chaos")
+    # plt.xlabel("x")
+    # plt.ylabel("y")
+    # plt.legend()
+    # plt.savefig("h.png")
+    # plt.show()
     # >>> Output: r = 4.1000000000000005
     # ****************************************
